@@ -1,18 +1,6 @@
 from random import randint
 
 
-# DONE: Keep playing after the game is done
-# DONE: Restart works
-# DONE: Rebuild the boards
-# DONE: Show Score
-# DONE: Keep score
-# TODO: Print boards side by side
-# TODO: Ask for a name
-# TODO: If name is SkillFactory use cheats and show the enemy board
-# TODO: Rename player/user classes to avoid confusion
-# TODO: Add docstrings to classes
-
-
 class Dot:
     def __init__(self, x, y):
         self.x = x
@@ -31,7 +19,7 @@ class BoardException(Exception):
 
 class BoardOutException(BoardException):
     def __str__(self):
-        return "Вы пытаетесь выстрелить за доску!"
+        return "Вы пытаетесь выстрелить за границы доски!"
 
 
 class BoardUsedException(BoardException):
@@ -83,17 +71,8 @@ class Board:
         self.busy = []
         self.ships = []
 
-    def new_board(self):  # , hid=False, size=6): # TODO Cleanup comments
+    def new_board(self):
         self.__init__()
-        # self.size = size
-        # self.hid = hid
-        #
-        # self.count = 0
-        #
-        # self.field = [["O"] * size for _ in range(size)]
-        #
-        # self.busy = []
-        # self.ships = []
 
     def add_ship(self, ship):
 
@@ -184,7 +163,6 @@ class Player:
 
 class AI(Player):
     def ask(self):
-        # TODO range changes with length of the board
         d = Dot(randint(0, 5), randint(0, 5))
         print(f"Ход компьютера: {d.x + 1} {d.y + 1}")
         return d
@@ -196,13 +174,13 @@ class User(Player):
             cords = input("Ваш ход: ").split()
 
             if len(cords) != 2:
-                print(" Введите 2 координаты! ")
+                print("Введите 2 координаты! ")
                 continue
 
             x, y = cords
 
             if not (x.isdigit()) or not (y.isdigit()):
-                print(" Введите числа! ")
+                print("Введите числа! ")
                 continue
 
             x, y = int(x), int(y)
@@ -216,7 +194,7 @@ class Game:
         self.size = size
         ai = self.random_board()
         us = self.random_board()
-        ai.hid = False  # TODO Disable later
+        ai.hid = True
 
         self.ai = AI(ai, us)
         self.us = User(us, ai)
@@ -224,29 +202,22 @@ class Game:
         self.ai_score = 0
         self.us_score = 0
 
-# TODO Print boards side by side
-# TODO Find a way to call __init__ in new_game and pass previous score as an argument
-    def new_game(self, size=6):
+    def new_game(self, size=6):  # Дублирование кода: не успел добавить вызов функции со счётом в качестве аргумента
         self.scoreboard = ''
         self.size = size
         ai = self.random_board()
         us = self.random_board()
-        ai.hid = False  # TODO Disable later
+        ai.hid = True
 
         self.ai = AI(ai, us)
         self.us = User(us, ai)
-
-        # self.ai_score = 0
-        # self.us_score = 0
-
 
     def score(self):
         self.scoreboard = f'Счёт: Пользователь {self.us_score} - Компьютер {self.ai_score}'
         print(self.scoreboard)
         return None
 
-    # TODO fix the line pointers
-    # Вопрос менторам: счёт лучше выводить через score() (211 строка) или через переопределение (строка 217)?
+    # Вопрос менторам: счёт лучше выводить через score() (215 строка) или через переопределение (строка 223)?
     # Скорее всего оба варианта ужасны, в этом случае, как лучше сделать отображение счёта?
 
     def __repr__(self):
@@ -266,7 +237,8 @@ class Game:
             Board.new_board(self)
             Game.new_game(self, 6)
             self.loop()
-            # TODO What happens if input is not '1'?
+        else:
+            print("Спасибо за игру!")
 
     def random_board(self):
         board = None
@@ -275,7 +247,7 @@ class Game:
         return board
 
     def random_place(self):
-        lens = [1, 1, 1, 1, 1, 1, 1] #  TODO return the:  lens = [3, 2, 2, 1, 1, 1, 1]
+        lens = [3, 2, 2, 1, 1, 1, 1]
         board = Board(size=self.size)
         attempts = 0
         for l in lens:
@@ -294,7 +266,7 @@ class Game:
 
     def greet(self):
         print("-------------------")
-        print("  Приветствуем вас  ")
+        print("  Приветствуем вас ")
         print("      в игре       ")
         print("    морской бой    ")
         print("-------------------")
@@ -346,10 +318,3 @@ class Game:
 
 g = Game()
 g.start()
-# g.user_win()
-# g.user_win()
-# g.co_win()
-print(g.us_score)
-print(g.ai_score)
-g.score()
-print(g)
